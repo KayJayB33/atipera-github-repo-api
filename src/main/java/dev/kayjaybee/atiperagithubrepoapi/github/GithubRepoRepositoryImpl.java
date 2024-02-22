@@ -29,20 +29,14 @@ class GithubRepoRepositoryImpl implements GithubRepoRepository {
         List<GithubRepo> allRepos = new ArrayList<>();
         String url = "/users/" + ownerLogin + "/repos?per_page=100";
         while (url != null) {
-            ResponseEntity<List<GithubRepo>> response = githubWebClient.get()
-                    .uri(url)
-                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                    .retrieve()
-                    .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse ->
-                            Mono.error(new UserNotFoundException("User " + ownerLogin + " not found")))
-                    .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(String.class)
-                            .flatMap(errorBody -> Mono.error(new GithubApiException("GitHub API Error: " + errorBody))))
-                    .toEntityList(GithubRepo.class)
-                    .block();
+            ResponseEntity<List<JsonNode>> response = getGithubApiResponse(ownerLogin, url);
 
             if (response != null && response.hasBody()) {
-                List<GithubRepo> repos = response.getBody();
-                allRepos.addAll(mapBranches(ownerLogin, repos));
+                List<GithubRepo> repos = response.getBody()
+                        .stream()
+                        .map(this::mapFromJsonToEntity)
+                        .toList();
+                allRepos.addAll(repos);
             }
 
             HttpHeaders headers = response != null ? response.getHeaders() : null;
@@ -50,6 +44,19 @@ class GithubRepoRepositoryImpl implements GithubRepoRepository {
         }
 
         return allRepos;
+    }
+
+    private ResponseEntity<List<JsonNode>> getGithubApiResponse(String ownerLogin, String url) {
+        return githubWebClient.get()
+                .uri(url)
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .retrieve()
+                .onStatus(HttpStatus.NOT_FOUND::equals, clientResponse ->
+                        Mono.error(new UserNotFoundException("User " + ownerLogin + " not found")))
+                .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.bodyToMono(String.class)
+                        .flatMap(errorBody -> Mono.error(new GithubApiException("GitHub API Error: " + errorBody))))
+                .toEntityList(JsonNode.class)
+                .block();
     }
 
     private String getNextPageUrl(HttpHeaders headers) {
@@ -68,30 +75,36 @@ class GithubRepoRepositoryImpl implements GithubRepoRepository {
         String[] parts = link.split(",");
         for (String part : parts) {
             if (part.contains("rel=\"next\"")) {
-                return part.split(";")[0].trim().replace("<", "").replace(">", "");
+                return part.split(";")[0]
+                        .trim()
+                        .replace("<", "")
+                        .replace(">", "");
             }
         }
         return null;
     }
 
-    private List<GithubRepo> mapBranches(String ownerLogin, List<GithubRepo> repos) {
-        for (GithubRepo repo : repos) {
-            List<Branch> branches = githubWebClient.get()
-                    .uri("/repos/" + ownerLogin + "/" + repo.getName() + "/branches")
-                    .retrieve()
-                    .bodyToFlux(JsonNode.class)
-                    .map(jsonNode -> {
-                        String name = jsonNode.get("name").asText();
-                        String lastCommitHash = jsonNode.get("commit").get("sha").asText();
-                        return new Branch(name, lastCommitHash);
-                    })
-                    .collectList()
-                    .blockOptional()
-                    .orElse(Collections.emptyList());
+    private GithubRepo mapFromJsonToEntity(JsonNode repoNode) {
+        GithubRepo repo = new GithubRepo();
+        repo.setName(repoNode.get("name").asText());
+        repo.setOwnerLogin(repoNode.get("owner").get("login").asText());
+        repo.setFork(repoNode.get("fork").asBoolean());
+        repo.setBranches(findBranches(repo));
+        return repo;
+    }
 
-            repo.setBranches(branches);
-        }
-
-        return repos;
+    private List<Branch> findBranches(GithubRepo repo) {
+        return githubWebClient.get()
+                .uri("/repos/" + repo.getOwnerLogin() + "/" + repo.getName() + "/branches")
+                .retrieve()
+                .bodyToFlux(JsonNode.class)
+                .map(jsonNode -> {
+                    String name = jsonNode.get("name").asText();
+                    String lastCommitHash = jsonNode.get("commit").get("sha").asText();
+                    return new Branch(name, lastCommitHash);
+                })
+                .collectList()
+                .blockOptional()
+                .orElse(Collections.emptyList());
     }
 }
