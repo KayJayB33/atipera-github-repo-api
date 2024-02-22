@@ -4,13 +4,11 @@ import java.util.List;
 
 class GithubRepo {
     private String name;
-    private String ownerLogin;
     private List<Branch> branches;
     private boolean fork;
 
-    public GithubRepo(String name, String ownerLogin, List<Branch> branches, boolean fork) {
+    public GithubRepo(String name, List<Branch> branches, boolean fork) {
         this.name = name;
-        this.ownerLogin = ownerLogin;
         this.branches = branches;
         this.fork = fork;
     }
@@ -26,13 +24,6 @@ class GithubRepo {
         this.name = name;
     }
 
-    public String getOwnerLogin() {
-        return ownerLogin;
-    }
-
-    public void setOwnerLogin(String ownerLogin) {
-        this.ownerLogin = ownerLogin;
-    }
 
     public List<Branch> getBranches() {
         return branches;
@@ -50,5 +41,12 @@ class GithubRepo {
         this.fork = fork;
     }
 
-
+    @Override
+    public String toString() {
+        return "GithubRepo{" +
+                "name='" + name + '\'' +
+                ", branches=" + branches +
+                ", fork=" + fork +
+                '}';
+    }
 }
