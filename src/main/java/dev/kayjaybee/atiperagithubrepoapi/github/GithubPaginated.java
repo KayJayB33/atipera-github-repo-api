@@ -1,5 +1,9 @@
 package dev.kayjaybee.atiperagithubrepoapi.github;
 
+import dev.kayjaybee.atiperagithubrepoapi.exception.GithubApiException;
+import dev.kayjaybee.atiperagithubrepoapi.exception.NotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -29,6 +33,12 @@ record GithubPaginated(String firstPage, String lastPage, String nextPage, Strin
         return githubWebClient.get()
                 .uri(url)
                 .retrieve()
+                .onStatus(HttpStatus.NOT_FOUND::equals, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new NotFoundException(body))))
+                .onStatus(HttpStatusCode::isError, response ->
+                        response.bodyToMono(String.class)
+                                .flatMap(body -> Mono.error(new GithubApiException(body))))
                 .toEntityFlux(clazz);
     }
 

@@ -2,7 +2,7 @@ package dev.kayjaybee.atiperagithubrepoapi.github;
 
 import dev.kayjaybee.atiperagithubrepoapi.exception.ErrorResponse;
 import dev.kayjaybee.atiperagithubrepoapi.exception.GithubApiException;
-import dev.kayjaybee.atiperagithubrepoapi.exception.UserNotFoundException;
+import dev.kayjaybee.atiperagithubrepoapi.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +26,9 @@ class GithubRepoController {
         return githubRepoService.getGithubReposByOwnerLogin(ownerLogin, isFork);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    ErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
+    ErrorResponse handleUserNotFoundException(NotFoundException ex) {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
