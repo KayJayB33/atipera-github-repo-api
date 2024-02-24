@@ -8,7 +8,9 @@ group = 'dev.kayjaybee'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '20'
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 
 repositories {
