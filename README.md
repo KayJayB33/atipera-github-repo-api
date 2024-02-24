@@ -18,54 +18,54 @@ You can also retrieve the forked repositories by adding the `fork` query paramet
 Example response for the user `KayJayB33` looks like this:
 ```json
 [
-    {
-        "name": "IR-Head-Tracker",
-        "ownerLogin": "KayJayB33",
-        "branches": [
-            {
-                "name": "enhancement/udp",
-                "lastCommitHash": "ccce1e5418ac1e4e58d0bf9af625ab0009e2c0da"
-            },
-            {
-                "name": "master",
-                "lastCommitHash": "655f29932e24e8725bd1f27370e49b31ca27b414"
-            }
-        ],
-        "fork": false
-    },
-    {
-        "name": "ZTP-Projekt-1",
-        "ownerLogin": "KayJayB33",
-        "branches": [
-            {
-                "name": "master",
-                "lastCommitHash": "71c4a637e7656f52a95c9d314808ff2753d00b9e"
-            }
-        ],
-        "fork": false
-    },
-    {
-        "name": "ZTP-Projekt-2",
-        "ownerLogin": "KayJayB33",
-        "branches": [
-            {
-                "name": "master",
-                "lastCommitHash": "36d22a3d4b9ee21683afd824f6ac61c6d20a607b"
-            }
-        ],
-        "fork": false
-    },
-    {
-        "name": "ZTP-Projekt-3",
-        "ownerLogin": "KayJayB33",
-        "branches": [
-            {
-                "name": "master",
-                "lastCommitHash": "60c55e5f335a4316f015660eb10704afa0849ac9"
-            }
-        ],
-        "fork": false
-    }
+  {
+    "name": "IR-Head-Tracker",
+    "owner_login": "KayJayB33",
+    "branches": [
+      {
+        "name": "enhancement/udp",
+        "last_commit_hash": "ccce1e5418ac1e4e58d0bf9af625ab0009e2c0da"
+      },
+      {
+        "name": "master",
+        "last_commit_hash": "655f29932e24e8725bd1f27370e49b31ca27b414"
+      }
+    ],
+    "fork": false
+  },
+  {
+    "name": "ZTP-Projekt-1",
+    "owner_login": "KayJayB33",
+    "branches": [
+      {
+        "name": "master",
+        "last_commit_hash": "71c4a637e7656f52a95c9d314808ff2753d00b9e"
+      }
+    ],
+    "fork": false
+  },
+  {
+    "name": "ZTP-Projekt-2",
+    "owner_login": "KayJayB33",
+    "branches": [
+      {
+        "name": "master",
+        "last_commit_hash": "36d22a3d4b9ee21683afd824f6ac61c6d20a607b"
+      }
+    ],
+    "fork": false
+  },
+  {
+    "name": "ZTP-Projekt-3",
+    "owner_login": "KayJayB33",
+    "branches": [
+      {
+        "name": "master",
+        "last_commit_hash": "60c55e5f335a4316f015660eb10704afa0849ac9"
+      }
+    ],
+    "fork": false
+  }
 ]
 ```
 
@@ -75,8 +75,8 @@ When an error occurs, the application will return a response with appropriate HT
 and body with the following structure:
 ```json
 {
-  "status": {httpStatusCode},
-  "message": {errorMessage}
+  "status": "${httpStatusCode}",
+  "message": "${errorMessage}"
 }
 ```
 
