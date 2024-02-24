@@ -1,4 +1,4 @@
 package dev.kayjaybee.atiperagithubrepoapi.github;
 
-public record Branch(String name, Commit commit) {
+public record Owner(String login) {
 }

@@ -7,23 +7,22 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 
 @Repository
-class GithubRepoRepositoryImpl implements GithubRepoRepository {
+public class BranchRepositoryImpl implements BranchRepository {
 
     private final WebClient githubWebClient;
 
-    GithubRepoRepositoryImpl(WebClient githubWebClient) {
+    BranchRepositoryImpl(WebClient githubWebClient) {
         this.githubWebClient = githubWebClient;
     }
 
-
     @Override
-    public List<GithubRepo> getGithubReposByOwnerLogin(String ownerLogin) {
-        var uri = UriComponentsBuilder.fromUriString("/users/{owner}/repos")
+    public List<Branch> getBranchesByOwnerLoginAndRepoName(String ownerLogin, String repoName) {
+        var uri = UriComponentsBuilder.fromUriString("/repos/{owner}/{repo}/branches")
                 .queryParam("per_page", 100)
                 .build()
-                .expand(ownerLogin)
+                .expand(ownerLogin, repoName)
                 .toUriString();
 
-        return GithubPaginated.getAllData(githubWebClient, uri, GithubRepo.class);
+        return GithubPaginated.getAllData(githubWebClient, uri, Branch.class);
     }
 }

@@ -20,7 +20,7 @@ class GithubRepoController {
     }
 
     @GetMapping("/{ownerLogin}")
-    List<GithubRepo> getGithubReposByOwnerLogin(
+    List<GithubRepoDTO> getGithubReposByOwnerLogin(
             @PathVariable String ownerLogin,
             @RequestParam(name = "fork", defaultValue = "false") boolean isFork) {
         return githubRepoService.getGithubReposByOwnerLogin(ownerLogin, isFork);
